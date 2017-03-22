@@ -17,25 +17,20 @@ var roleUpgrader = {
         if(creep.memory.upgrading) {
             creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
             if(creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                // creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+                creep.moveTo(creep.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
             }
-        } else {
+        }
+        else {
             var target = Game.getObjectById(creep.memory.target);
-            if(target == null || target.energy == 0) {
-                var sources = creep.room.find(FIND_SOURCES, {
-                    filter: (source) => {
-                        return (source.energy > 0)
-                    }
-                });
-                if(sources.length > 0) {
-                    var index = Game.time % sources.length;
-                    creep.memory.target = sources[index].id;
-                    target = Game.getObjectById(creep.memory.target);
-                }
-            }
             if(target != null) {
                 if(creep.harvest(target) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
+                }
+            } else {
+                var sources = creep.room.find(FIND_SOURCES);
+                if(sources.length > 0) {
+                    var index = Game.time % sources.length;
+                    creep.memory.target = sources[index].id;
                 }
             }
         }

@@ -15,10 +15,10 @@ module.exports.loop = function () {
     var roles = [
         roleMod.createRole([WORK,CARRY,MOVE], "slave", 0, roleHarvester),
         roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],"harvester", 3, roleHarvester),
-        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],"upgrader", 2, roleUpgrader),
-        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],"builder", 2, roleBuilder),
+        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],"upgrader", 3, roleUpgrader),
+        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE],"builder", 1, roleBuilder),
         roleMod.createRole([TOUGH,TOUGH,ATTACK,MOVE,MOVE,MOVE],"soldier", 0, roleSoldier),
-        roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "god", 0, roleSoldier)
+        roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "god", 1, roleSoldier)
     ];
 
     for(var roleIndex in roles) {
@@ -57,7 +57,7 @@ module.exports.loop = function () {
     }
 
     // var tower = undefined;
-    var tower = Game.getObjectById('58d2362ae488f8d1412b4064');
+    var tower = Game.getObjectById('330bfbb5d1deacb');
     if(tower) {
         var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => structure.hits < structure.hitsMax
