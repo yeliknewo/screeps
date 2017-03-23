@@ -4,7 +4,7 @@ var roleHarvester = {
     run: function(creep) {
         if(creep.memory.transfering && creep.carry.energy == 0) {
             creep.memory.transfering = false;
-            creep.say('🔄 harvest');
+            creep.say('🔄 Mine');
             creep.memory.target = null;
         }
         if(!creep.memory.transfering && creep.carry.energy == creep.carryCapacity) {
@@ -12,45 +12,70 @@ var roleHarvester = {
             creep.say('Transfer');
             creep.memory.target = null;
         }
-
         if(creep.memory.transfering) {
             var target = Game.getObjectById(creep.memory.target);
             if(target == null || target.energy == target.energyCapacity) {
                 var newTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (structure) => {
-                        return (structure.structureType == STRUCTURE_EXTENSION ||
-                            structure.structureType == STRUCTURE_SPAWN ||
-                            structure.structureType == STRUCTURE_TOWER) && structure.energy < structure.energyCapacity;
+                        return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity;
                     }
                 });
                 if(newTarget != null) {
                     creep.memory.target = newTarget.id;
                     target = Game.getObjectById(creep.memory.target);
+                } else {
+                    var newTarget = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return structure.structureType == STRUCTURE_TOWER && structure.energy < structure.energyCapacity;
+                        }
+                    });
+                    if(newTarget != null) {
+                        creep.memory.target = newTarget.id;
+                        target = Game.getObjectById(creep.memory.target);
+                    }
                 }
             }
             if(target != null) {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
                 if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    // creep.moveTo(target, {visualizePathStyle: {stroke: '#ffffff'}});
+                    creep.moveTo(target, {visualizePathStyle: {stroke: '#00ffff'}});
                 }
             }
         } else {
             var target = Game.getObjectById(creep.memory.target);
             if(target == null || target.energy == 0) {
-                var sources = creep.room.find(FIND_SOURCES, {
-                    filter: (source) => {
-                        return (source.energy > 0)
+                var newTarget = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+                    filter: (resource) => {
+                        return resource.amount > 100;
                     }
                 });
-                if(sources.length > 0) {
-                    var index = Game.time % sources.length;
-                    creep.memory.target = sources[index].id;
-                    target = Game.getObjectById(creep.memory.target);
+                if(newTarget != null) {
+                    creep.memory.target = newTarget.id;
+                    target = newTarget;
                 }
             }
-            if(target != null) {
-                if(creep.harvest(target) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(target, {visualizePathStyle: {stroke: '#ffaa00'}});
+            if(target != null && target.resourceType != null) {
+                if(creep.pickup(target) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(target, {visualizePathStyle: {stroke: '#00ffff'}});
+                }
+            } else {
+                if(target == null || target.energy == 0) {
+                    var newTarget = creep.pos.findClosestByPath(FIND_SOURCES, {
+                        filter: (source) => {
+                            return (source.energy > 0)
+                        }
+                    });
+                    if(newTarget != null) {
+                        creep.memory.target = newTarget.id;
+                        target = newTarget;
+                    }
+                }
+                if(target != null) {
+                    if(creep.harvest(target) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(target, {visualizePathStyle: {stroke: '#00ffff'}});
+                    }
+                } else if(creep.energy > 0) {
+                    creep.memory.transfering = true;
+                    creep.memory.target = null;
                 }
             }
         }

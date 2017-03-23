@@ -14,7 +14,7 @@ var roleMiner = {
         if(creep.carry.energy == 0) {
             creep.memory.mining = true;
         }
-        
+
         if(creep.memory.mining) {
             var sources = creep.room.find(FIND_SOURCES);
             if(creep.harvest(sources[creep.memory.sourceIndex]) == ERR_NOT_IN_RANGE) {
@@ -34,7 +34,7 @@ var roleMiner = {
                 creep.moveTo(targets[0]);
             }
         }
-        
+
     }
 }
 module.exports = roleMiner;

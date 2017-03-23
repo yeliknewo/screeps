@@ -4,7 +4,7 @@ var roleUpgrader = require('role.upgrader');
 var roleSoldier = require('role.soldier');
 
 module.exports.loop = function () {
-    
+
     for(var name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
@@ -19,14 +19,14 @@ module.exports.loop = function () {
         if(closestDamagedStructure) {
             tower.repair(closestDamagedStructure);
         }
-    
+
         var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if(closestHostile) {
             tower.attack(closestHostile);
         }
     }
-    
-    
+
+
     var miners = 0; //store in global memory?
     var builders = 0;
     var upgraders = 0;
@@ -65,5 +65,5 @@ module.exports.loop = function () {
     else if(soldiers < 6) {
         Game.spawns['Spawn1'].createCreep([MOVE, ATTACK], null, {role: 'soldier'});
     }
-    
+
 }

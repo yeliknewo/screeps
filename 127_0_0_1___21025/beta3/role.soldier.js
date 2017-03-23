@@ -1,6 +1,9 @@
 var roleSoldier = {
     /** param {Creep} creep **/
     run: function(creep) {
+        if(creep.memory.usedRooms == null) {
+            creep.memory.usedRooms = {};
+        }
         if(creep.memory.attackTarget == null) {
             var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
             if(target != null) {
@@ -29,8 +32,8 @@ var roleSoldier = {
         if(creep.memory.attackTarget == null) {
             if(creep.memory.raidTarget == null) {
                 var targetRooms = Game.map.describeExits(creep.room.name);
-                var choice = Game.time % (Game.time % 4);
-                while(choice > 0) {
+                var choice = Game.time % 4;
+                while(choice >= 0) {
                     for(var targetIndex in targetRooms) {
                         if(choice > 0) {
                             choice--;
@@ -38,14 +41,19 @@ var roleSoldier = {
                         }
                         var targetRoom = targetRooms[targetIndex];
                         if(targetRoom != null) {
+                            if(creep.memory.usedRooms[targetRoom] != null && creep.memory.usedRooms[targetRoom] > Game.time) {
+                                continue;
+                            }
                             var exitDir = creep.room.findExitTo(targetRoom);
                             var exit = creep.pos.findClosestByPath(exitDir);
                             creep.memory.raidTarget = {roomName: creep.room.name, x: exit.x, y: exit.y};
-                            choice = 0;
+                            creep.memory.usedRooms[creep.room.name] = Game.time + 100;
                             break;
                         }
                     }
-                    choice--;
+                    if(choice == 0) {
+                        choice = -1;
+                    }
                 }
             }
             if(creep.memory.raidTarget != null) {
