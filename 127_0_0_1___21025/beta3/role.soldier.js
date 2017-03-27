@@ -1,10 +1,11 @@
 var roleSoldier = {
     /** param {Creep} creep **/
     run: function(creep) {
+        var pathColor = '#FF0000';
         if(creep.memory.usedRooms == null) {
             creep.memory.usedRooms = {};
         }
-        if(creep.memory.attackTarget == null) {
+        if(creep.memory.attackTarget == null || Game.time % 2 == 0) {
             var target = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
             if(target != null) {
                 creep.memory.attackTarget = target.id;
@@ -24,8 +25,10 @@ var roleSoldier = {
             if(target == null) {
                 creep.memory.attackTarget = null;
             } else {
-                creep.moveTo(target, {visualizePathStyle: {stroke: '#ff0000'}});
-                creep.attack(target);
+                if(creep.attack(target) == ERR_NOT_IN_RANGE) {
+                    creep.rangedAttack(target);
+                    creep.moveTo(target, {reusePath: 0, visualizePathStyle: {stroke: pathColor}});
+                }
                 return;
             }
         }
@@ -57,7 +60,7 @@ var roleSoldier = {
                 }
             }
             if(creep.memory.raidTarget != null) {
-                var result = creep.moveTo(creep.room.getPositionAt(creep.memory.raidTarget.x, creep.memory.raidTarget.y), {visualizePathStyle: {stroke: '#ff0000'}});
+                var result = creep.moveTo(creep.room.getPositionAt(creep.memory.raidTarget.x, creep.memory.raidTarget.y), {visualizePathStyle: {stroke: pathColor}});
                 if(creep.memory.raidTarget.roomName != creep.room.name) {
                     creep.memory.raidTarget = null;
                 }

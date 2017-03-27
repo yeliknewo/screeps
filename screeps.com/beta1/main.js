@@ -1,12 +1,11 @@
 var roleMod = require('role');
 
-var roleHarvester = require('role.harvester');
-// var roleUpgrader = require('role.upgrader');
-// var roleBuilder = require('role.builder');
+var roleMiner = require('role.miner');
+var rolePowerMiner = require('role.powerMiner');
+var roleHauler = require('role.hauler');
+var roleUpgrader = require('role.upgrader');
+var roleBuilder = require('role.builder');
 var roleSoldier = require('role.soldier');
-
-var roleSBuilder = require('role.sbuilder');
-var roleSUpgrader = require('role.supgrader');
 
 module.exports.loop = function () {
     for(var name in Memory.creeps) {
@@ -17,20 +16,39 @@ module.exports.loop = function () {
     }
 
     Memory.roles = [
-        roleMod.createRole([WORK,CARRY,MOVE], "t1_miner", 0, roleHarvester),
-        roleMod.createRole([WORK,CARRY,MOVE], "t1_upgrader", 0, roleSUpgrader),
-        roleMod.createRole([WORK,CARRY,MOVE], "t1_builder", 0, roleSBuilder),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE], "t1_power_miner", 1, rolePowerMiner),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE], "t2_power_miner", 0, rolePowerMiner),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE], "t3_power_miner", 0, rolePowerMiner),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE], "t4_power_miner", 0, rolePowerMiner),
+        roleMod.createRole([CARRY,CARRY,MOVE], "t1_hauler", 1, roleHauler),
+        roleMod.createRole([CARRY,CARRY,CARRY,CARRY,MOVE,MOVE], "t2_hauler", 0, roleHauler),
+        roleMod.createRole([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE], "t3_hauler", 0, roleHauler),
+        roleMod.createRole([CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_hauler", 1, roleHauler),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE], "t1_power_upgrader", 1, roleUpgrader),
+        roleMod.createRole([WORK,CARRY,MOVE], "t1_miner", 0, roleMiner),
+        roleMod.createRole([WORK,CARRY,MOVE,MOVE], "t1_miner_ld", 0, roleMiner, {
+            longDistance: true,
+            globalIndex: 1
+        }),
+        roleMod.createRole([WORK,CARRY,MOVE], "t1_upgrader", 0, roleUpgrader),
+        roleMod.createRole([WORK,CARRY,MOVE], "t1_builder", 0, roleBuilder),
         roleMod.createRole([TOUGH,TOUGH,ATTACK,MOVE,MOVE,MOVE],"t1_soldier", 0, roleSoldier),
-        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_miner", 0, roleHarvester),
-        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_upgrader", 0, roleSUpgrader),
-        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_builder", 0, roleSBuilder),
+        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_miner", 0, roleMiner),
+        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_upgrader", 0, roleUpgrader),
+        roleMod.createRole([WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE], "t2_builder", 1, roleBuilder),
         roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t2_soldier", 0, roleSoldier),
-        roleMod.createRole([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_miner", 4, roleHarvester),
-        roleMod.createRole([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_upgrader", 1, roleSUpgrader),
-        roleMod.createRole([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_builder", 1, roleSBuilder),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_miner", 0, roleMiner),
+        roleMod.createRole([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_upgrader", 0, roleUpgrader),
+        roleMod.createRole([WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE], "t3_builder", 0, roleBuilder),
         roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t3_soldier", 0, roleSoldier),
-        roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_soldier", 0, roleSoldier)
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_miner", 0, roleMiner),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_upgrader", 0, roleUpgrader),
+        roleMod.createRole([WORK,WORK,WORK,WORK,WORK,WORK,CARRY,CARRY,CARRY,CARRY,CARRY,CARRY,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_builder", 0, roleBuilder),
+        roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,ATTACK,ATTACK,ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t4_soldier", 0, roleSoldier),
+        roleMod.createRole([TOUGH,TOUGH,TOUGH,TOUGH,ATTACK,ATTACK,RANGED_ATTACK,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE,MOVE], "t1_ranger", 0, roleSoldier)
     ];
+
+    Memory.globalSources = [new RoomPosition(19, 8, "W56N3"), new RoomPosition(9, 4, "W56N2")];
 
     Memory.roleIndexer = {};
 
@@ -64,24 +82,23 @@ module.exports.loop = function () {
         if(roleIndex != -1) {
             var role = Memory.roles[roleIndex];
             if(spawn.canCreateCreep(role.body) == OK) {
-                spawn.createCreep(role.body, undefined, {role: role.name});
+                spawn.createCreep(role.body, undefined, {role: role.name, data: role.data});
                 console.log("Spawning " + role.name);
             }
         }
     }
 
-    Memory.creepsReady = true;
-    for(var roleIndex in Memory.roles) {
-        var role = Memory.roles[roleIndex];
-        if(role.creeps.length < role.targetCount) {
-            Memory.creepsReady = false;
-        }
-        for(var creepIndex in role.creeps) {
-            var creep = role.creeps[creepIndex];
-            if(creep.ticksToLive < 50) {
-                Memory.creepsReady = false;
-                break;
+    for(var roomIndex in Game.rooms) {
+        var room = Game.rooms[roomIndex];
+        var storages = room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) => {
+                return structure.structureType == STRUCTURE_STORAGE && structure.store[RESOURCE_ENERGY] > 2000;
             }
+        });
+        if(storages.length > 0) {
+            Memory.creepsReady = true;
+        } else {
+            Memory.creepsReady = false;
         }
     }
 
@@ -91,7 +108,7 @@ module.exports.loop = function () {
             var closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
             if(closestHostile) {
                 structure.attack(closestHostile);
-            } else if(structure.energy > 500) {
+            } else if(structure.energy >= 600) {
                 var closestHurtFriendly = structure.pos.findClosestByRange(FIND_MY_CREEPS, {
                     filter: (creep) => {
                         return creep.hits < creep.hitsMax;
@@ -99,44 +116,35 @@ module.exports.loop = function () {
                 });
                 if(closestHurtFriendly) {
                     structure.heal(closestHurtFriendly);
-                } else {
+                } else if(structure.energy >= 800) {
                     var damagedStructures = structure.room.find(FIND_STRUCTURES, {
                         filter: (structure) => {
-                            return structure.hits + 200 < structure.hitsMax && structure.structureType != STRUCTURE_WALL && structure.structureType != STRUCTURE_RAMPART;
+                            return structure.hits <= Math.min(structure.hitsMax / 4, 2000) && structure.hits < structure.hitsMax;
                         }
                     });
+                    damagedStructures.sort(function(a, b) {
+                        return a.hits - b.hits;
+                    });
                     if(damagedStructures.length > 0) {
-                        var index = Game.time % damagedStructures.length;
+                        var index = 0;
+                        // var index = Game.time % damagedStructures.length;
                         structure.repair(damagedStructures[index]);
-                    } else {
-                        var damagedStructures = structure.room.find(FIND_STRUCTURES, {
-                            filter: (structure) => {
-                                return structure.hits + 200 < structure.hitsMax && structure.structureType == STRUCTURE_RAMPART;
-                            }
-                        });
-                        if(damagedStructures.length > 0) {
-                            var index = Game.time % damagedStructures.length;
-                            structure.repair(damagedStructures[index]);
-                        } else {
-                            var damagedStructures = structure.pos.findClosestByRange(FIND_STRUCTURES, {
-                                filter: (structure) => {
-                                    return structure.hits + 200 < structure.hitsMax && structure.hits < 10000;
-                                }
-                            });
-                            if(damagedStructures.length > 0) {
-                                var index = Game.time % damagedStructures.length;
-                                structure.repair(damagedStructures[index]);
-                            } else {
-                                var damagedStructures = structure.room.find(FIND_STRUCTURES, {
-                                    filter: (structure) => structure.hits < structure.hitsMax
-                                });
-                                if(damagedStructures.length > 0) {
-                                    var index = Game.time % damagedStructures.length;
-                                    structure.repair(damagedStructures[index]);
-                                }
-                            }
-                        }
                     }
+                }
+            }
+        } else if(structure.structureType == STRUCTURE_LINK) {
+            if(structure.cooldown <= 0) {
+                var others = structure.room.find(FIND_MY_STRUCTURES, {
+                    filter: (link) => {
+                        return link.structureType == STRUCTURE_LINK && link.id != structure.id && link.energy < structure.energy * 0.90;
+                    }
+                });
+                if(others.length > 0) {
+                    var index = 0;
+                    var target = others[index];
+                    var average = (structure.energy + target.energy) / 2;
+                    // console.log(average  - target.energy);
+                    structure.transferEnergy(target, average - target.energy);
                 }
             }
         }
