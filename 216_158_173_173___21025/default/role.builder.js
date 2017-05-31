@@ -2,7 +2,8 @@ var roleBuilder = {
     /** @param {Creep} creep **/
     run: function(creep) {
         var pathColor = '#00FFFF';
-        if (creep.memory.building && creep.carry.energy == 0 && Memory.creepsReady) {
+        if (creep.memory.building && creep.carry.energy == 0 && Memory.creepsReady ==
+            true) {
             creep.memory.building = false;
             creep.say('Withdraw');
             creep.memory.target = null;
@@ -125,7 +126,9 @@ var roleBuilder = {
                                 creep.carryCapacity - creep
                                 .carry.energy) || ((
                                     structure.structureType ==
-                                    STRUCTURE_LINK) &&
+                                    STRUCTURE_LINK ||
+                                    structure.structureType ==
+                                    STRUCTURE_SPAWN) &&
                                 structure.energy > creep.carryCapacity -
                                 creep.carry.energy);
                         }

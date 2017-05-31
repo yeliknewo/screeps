@@ -3,7 +3,7 @@ var roleUpgrader = {
     run: function(creep) {
         var pathColor = '#0000FF';
         if (creep.memory.upgrading && creep.carry.energy == 0 && Memory
-            .creepsReady) {
+            .creepsReady == true) {
             creep.memory.upgrading = false;
             creep.say('Withdraw');
             creep.memory.target = null;
@@ -50,7 +50,9 @@ var roleUpgrader = {
                                 creep.carryCapacity - creep
                                 .carry.energy) || ((
                                     structure.structureType ==
-                                    STRUCTURE_LINK) &&
+                                    STRUCTURE_LINK ||
+                                    structure.structureType ==
+                                    STRUCTURE_SPAWN) &&
                                 structure.energy >= creep.carryCapacity -
                                 creep.carry.energy);
                         }
