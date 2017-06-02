@@ -15,9 +15,9 @@ module.exports.loop = function() {
 
     Memory.roles = [
         modRole.createRole([WORK, WORK, MOVE],
-            'mine_t1', 0, roleMiner),
+            'mine_t1', 1, roleMiner),
         modRole.createRole([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
-            'haul_t1', 0,
+            'haul_t1', 1,
             roleHauler),
         modRole.createRole([WORK, WORK, CARRY, MOVE], 'up_t1', 0,
             roleUpgrader),
@@ -38,7 +38,7 @@ module.exports.loop = function() {
             'mine_t3', 2, roleMiner),
         modRole.createRole([MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY,
             CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY
-        ], 'haul_t3', 3, roleHauler),
+    ], 'haul_t3', 4, roleHauler),
         modRole.createRole([MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK,
             WORK, WORK, CARRY, CARRY
         ], 'up_t3', 3, roleUpgrader),
