@@ -9,15 +9,13 @@ var roleMiner = {
                 if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(source, {
                         reusePath: 0,
-                        visualizePathStyle: {
-                            stroke: pathColor
-                        }
+                        visualizePathStyle: pathColor
                     });
                 }
-            }
-        }
-        if (creep.memory.targetSource == null || Game.time % 100 == 0) {
-            creep.memory.targetSource = creep.memory.number %
+            } else {}
+        } else {
+            creep.memory.targetSource = Memory.roleCounts[
+                    creep.memory.role] %
                 Memory.sources.length;
         }
     }

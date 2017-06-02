@@ -15,36 +15,15 @@ module.exports.loop = function() {
 
     Memory.roles = [
         modRole.createRole([WORK, WORK, MOVE],
-            'mine_t1', 0, roleMiner),
-        modRole.createRole([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
-            'haul_t1', 0,
-            roleHauler),
-        modRole.createRole([WORK, WORK, CARRY, MOVE], 'up_t1', 0,
-            roleUpgrader),
-        modRole.createRole([WORK, CARRY, MOVE, MOVE], 'build_t1', 0,
-            roleBuilder),
+            'mine_t1', 2, roleMiner),
         modRole.createRole([WORK, WORK, WORK, WORK, WORK, MOVE],
             'mine_t2', 0, roleMiner),
-        modRole.createRole([WORK, WORK, WORK, WORK, CARRY, MOVE,
-                MOVE
-            ],
-            'up_t2', 0,
+        modRole.createRole([CARRY, CARRY, MOVE, MOVE], 'haul_t1', 2,
+            roleHauler),
+        modRole.createRole([WORK, CARRY, MOVE], 'up_t1', 1,
             roleUpgrader),
-        modRole.createRole([WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE,
-                MOVE
-            ], 'build_t2',
-            0, roleBuilder),
-        modRole.createRole([WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
-            'mine_t3', 2, roleMiner),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY,
-            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY
-        ], 'haul_t3', 3, roleHauler),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK,
-            WORK, WORK, CARRY, CARRY
-        ], 'up_t3', 3, roleUpgrader),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK,
-            WORK, WORK, CARRY, CARRY, CARRY
-        ], 'build_t3', 3, roleBuilder)
+        modRole.createRole([WORK, CARRY, MOVE, MOVE], 'build_t1', 1,
+            roleBuilder)
     ];
 
     Memory.indexerRole = {};
@@ -58,9 +37,6 @@ module.exports.loop = function() {
         var role = Memory.roles[indexRole];
         role.creeps = _.filter(Game.creeps, (creep) => creep.memory.role ==
             role.name);
-        for (var indexCreep in role.creeps) {
-            role.creeps[indexCreep].memory.number = indexCreep;
-        }
         if (Memory.roleCounts == null) {
             Memory.roleCounts = {};
         }
@@ -76,7 +52,11 @@ module.exports.loop = function() {
     for (var indexSpawn in Game.spawns) {
         var spawn = Game.spawns[indexSpawn];
 
-        Memory.creepsReady = spawn.room.energyAvailable == spawn.room.energyCapacityAvailable;
+        if (spawn.energy == spawn.energyCapacity) {
+            Memory.creepsReady = true;
+        } else {
+            Memory.creepsReady = false;
+        }
 
         var sources = spawn.room.find(FIND_SOURCES);
 

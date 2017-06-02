@@ -50,14 +50,11 @@ var roleUpgrader = {
                                 creep.carryCapacity - creep
                                 .carry.energy) || ((
                                     structure.structureType ==
-                                    STRUCTURE_LINK) &&
+                                    STRUCTURE_LINK ||
+                                    structure.structureType ==
+                                    STRUCTURE_SPAWN) &&
                                 structure.energy >= creep.carryCapacity -
                                 creep.carry.energy);
-                            // ||
-                            // structure.structureType ==
-                            // STRUCTURE_SPAWN ||
-                            // structure.structureType ==
-                            // STRUCTURE_EXTENSION
                         }
                     });
                 if (newTarget != null) {

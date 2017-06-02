@@ -13,22 +13,12 @@ var roleHauler = {
         }
         if (creep.memory.transfering) {
             var targetRequester = creep.pos.findClosestByPath(
-                FIND_STRUCTURES, {
+                FIND_MY_STRUCTURES, {
                     filter: (structure) => {
-                        return ((structure.structureType ==
-                                    STRUCTURE_SPAWN ||
-                                    structure.structureType ==
-                                    STRUCTURE_EXTENSION ||
-                                    structure.structureType ==
-                                    STRUCTURE_TOWER) &&
-                                structure.energy < structure.energyCapacity
-                            ) ||
-                            ((structure.structureType ==
-                                    STRUCTURE_CONTAINER ||
-                                    structure.structureType ==
-                                    STRUCTURE_STORAGE) &&
-                                _.sum(structure.store) <
-                                structure.storeCapacity);
+                        return (structure.structureType ==
+                                STRUCTURE_SPAWN || structure.structureType ==
+                                STRUCTURE_EXTENSION) &&
+                            structure.energy < structure.energyCapacity;
                     }
                 }
             );

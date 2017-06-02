@@ -17,7 +17,7 @@ var roleBuilder = {
             var target = Game.getObjectById(creep.memory.target);
             if (target == null || target.hits == target.hitsMax) {
                 var newTarget = creep.pos.findClosestByPath(
-                    FIND_CONSTRUCTION_SITES);
+                    FIND_MY_CONSTRUCTION_SITES);
                 if (newTarget != null) {
                     creep.memory.target = newTarget.id;
                     target = newTarget;
@@ -69,21 +69,25 @@ var roleBuilder = {
                             target = targets[index];
                             creep.memory.target = target.id;
                         } else {
-                            var targets = creep.room.find(
-                                FIND_STRUCTURES, {
-                                    filter: (structure) => {
-                                        return structure.hits <
-                                            structure.hitsMax;
-                                    }
-                                });
-                            targets.sort((a, b) => {
-                                return a.hits / a.hitsMax - b.hits /
-                                    b.hitsMax;
-                            });
-                            if (targets.length > 0) {
-                                var index = 0;
-                                target = targets[index];
-                                creep.memory.target = target.id;
+                            var mult = 1 << 8;
+                            while (target == null && mult > 0) {
+                                var newTarget = creep.pos.findClosestByPath(
+                                    FIND_STRUCTURES, {
+                                        filter: (structure) => {
+                                            return structure.hits <
+                                                structure.hitsMax /
+                                                mult &&
+                                                structure.structureType !=
+                                                STRUCTURE_ROAD;
+                                        }
+                                    });
+                                if (newTarget != null) {
+                                    target = newTarget;
+                                    creep.memory.target = target.id;
+                                    mult = 0;
+                                } else {
+                                    Math.floor(mult / 2);
+                                }
                             }
                         }
                     }
@@ -122,13 +126,11 @@ var roleBuilder = {
                                 creep.carryCapacity - creep
                                 .carry.energy) || ((
                                     structure.structureType ==
-                                    STRUCTURE_LINK) &&
-                                structure.energy > 0); //creep.carryCapacity - creep.carry.energy
-                            //    ||
-                            //    structure.structureType ==
-                            //    STRUCTURE_SPAWN ||
-                            //    structure.structureType ==
-                            //    STRUCTURE_EXTENSION
+                                    STRUCTURE_LINK ||
+                                    structure.structureType ==
+                                    STRUCTURE_SPAWN) &&
+                                structure.energy > creep.carryCapacity -
+                                creep.carry.energy);
                         }
                     });
                 if (newTarget != null) {
