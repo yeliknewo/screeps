@@ -7,13 +7,18 @@ var roleUpgrader = {
             creep.memory.upgrading = false;
             creep.say('Withdraw');
             creep.memory.target = null;
+            creep.memory.waiting = false;
         }
         if (!creep.memory.upgrading && creep.carry.energy == creep.carryCapacity) {
             creep.memory.upgrading = true;
             creep.say('⚡ Upgrade');
             creep.memory.target = null;
+            creep.memory.waiting = false;
         }
-        if (creep.memory.upgrading) {
+        if (creep.memory.waiting) {
+            creep.memory.waiting = !Memory.creepsReady;
+            creep.moveTo(creep.pos.findClosestByPath(FIND_FLAGS));
+        } else if (creep.memory.upgrading) {
             var target = Game.getObjectById(creep.memory.target);
             if (target == null) {
                 var newTarget = creep.room.controller;
@@ -78,10 +83,14 @@ var roleUpgrader = {
                     });
                 }
             }
-            if (target == null && creep.carry.energy > 0) {
-                creep.memory.upgrading = true;
-                creep.say('⚡ Upgrade');
-                creep.memory.target = null;
+            if (target == null) {
+                if (creep.carry.energy > 0) {
+                    creep.memory.upgrading = true;
+                    creep.say('⚡ Upgrade');
+                    creep.memory.target = null;
+                } else {
+                    creep.memory.waiting = !Memory.creepsReady;
+                }
             }
         }
     }

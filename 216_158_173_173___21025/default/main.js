@@ -13,11 +13,22 @@ module.exports.loop = function() {
         }
     }
 
+    var miningTarget = 2;
+    var haulingTarget = 4;
+    var upgradingTarget = 3;
+    var buildingTarget = 3;
+
+    var basicMiningTier = 'mine_t1';
+    var basicHaulingTier = 'haul_t1';
+
+    var currentMiningTier = 'mine_t3';
+    var currentHaulingTier = 'haul_t3';
+
     Memory.roles = [
         modRole.createRole([WORK, WORK, MOVE],
-            'mine_t1', 1, roleMiner),
+            'mine_t1', 0, roleMiner),
         modRole.createRole([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
-            'haul_t1', 1,
+            'haul_t1', 0,
             roleHauler),
         modRole.createRole([WORK, WORK, CARRY, MOVE], 'up_t1', 0,
             roleUpgrader),
@@ -35,16 +46,18 @@ module.exports.loop = function() {
             ], 'build_t2',
             0, roleBuilder),
         modRole.createRole([WORK, WORK, WORK, WORK, WORK, WORK, MOVE],
-            'mine_t3', 2, roleMiner),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY,
-            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY
-    ], 'haul_t3', 4, roleHauler),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, WORK, WORK, WORK,
-            WORK, WORK, CARRY, CARRY
-        ], 'up_t3', 3, roleUpgrader),
-        modRole.createRole([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, WORK,
-            WORK, WORK, CARRY, CARRY, CARRY
-        ], 'build_t3', 3, roleBuilder)
+            'mine_t3', miningTarget, roleMiner),
+        modRole.createRole([CARRY, CARRY,
+            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+            MOVE, MOVE, MOVE, MOVE, MOVE
+        ], 'haul_t3', haulingTarget, roleHauler),
+        modRole.createRole([WORK, WORK, WORK,
+            WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE
+        ], 'up_t3', upgradingTarget, roleUpgrader),
+        modRole.createRole([WORK,
+            WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE,
+            MOVE, MOVE
+        ], 'build_t3', buildingTarget, roleBuilder)
     ];
 
     Memory.indexerRole = {};
@@ -67,6 +80,12 @@ module.exports.loop = function() {
         Memory.roleCounts[role.name] = role.creeps.length;
     }
 
+    if (Memory.roleCounts[currentMiningTier] < 0 || Memory.roleCounts[
+            currentHaulingTier] == 0) {
+        Memory.roles[Memory.indexerRole[basicMiningTier]].targetCount = 1;
+        Memory.roles[Memory.indexerRole[basicHaulingTier]].targetCount = 1;
+    }
+
     if (Memory.sources == null) {
         Memory.sources = [];
     }
@@ -76,7 +95,9 @@ module.exports.loop = function() {
     for (var indexSpawn in Game.spawns) {
         var spawn = Game.spawns[indexSpawn];
 
-        Memory.creepsReady = spawn.room.energyAvailable == spawn.room.energyCapacityAvailable;
+        Memory.creepsReady = spawn.room.energyAvailable == spawn.room.energyCapacityAvailable ||
+            (spawn.room.storage != null && spawn.room.storage.store[
+                RESOURCE_ENERGY] > 0);
 
         var sources = spawn.room.find(FIND_SOURCES);
 
@@ -117,6 +138,45 @@ module.exports.loop = function() {
         for (var indexCreep in role.creeps) {
             var creep = role.creeps[indexCreep];
             role.roleModule.run(creep);
+        }
+    }
+
+    for (var index in Game.structures) {
+        var structure = Game.structures[index];
+        if (structure.structureType == STRUCTURE_TOWER) {
+            var closestHostile = structure.pos.findClosestByRange(
+                FIND_HOSTILE_CREEPS);
+            if (closestHostile) {
+                structure.attack(closestHostile);
+            } else if (structure.energy >= 600) {
+                var closestHurtFriendly = structure.pos.findClosestByRange(
+                    FIND_MY_CREEPS, {
+                        filter: (creep) => {
+                            return creep.hits < creep.hitsMax;
+                        }
+                    });
+                if (closestHurtFriendly) {
+                    structure.heal(closestHurtFriendly);
+                } else if (structure.energy >= 800) {
+                    var damagedStructures = structure.room.find(
+                        FIND_STRUCTURES, {
+                            filter: (structure) => {
+                                return structure.hits <= Math.min(
+                                        structure.hitsMax / 4, 2000
+                                    ) && structure.hits < structure
+                                    .hitsMax;
+                            }
+                        });
+                    damagedStructures.sort(function(a, b) {
+                        return a.hits - b.hits;
+                    });
+                    if (damagedStructures.length > 0) {
+                        var index = 0;
+                        // var index = Game.time % damagedStructures.length;
+                        structure.repair(damagedStructures[index]);
+                    }
+                }
+            }
         }
     }
 }
