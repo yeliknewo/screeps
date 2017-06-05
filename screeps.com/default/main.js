@@ -14,9 +14,9 @@ module.exports.loop = function() {
     }
 
     var miningTarget = 2;
-    var haulingTarget = 4;
-    var upgradingTarget = 3;
-    var buildingTarget = 3;
+    var haulingTarget = 6;
+    var upgradingTarget = 4;
+    var buildingTarget = 4;
 
     var basicMiningTier = 'mine_t1';
     var basicHaulingTier = 'haul_t1';
@@ -30,12 +30,18 @@ module.exports.loop = function() {
         modRole.createRole([CARRY, CARRY, CARRY, CARRY, MOVE, MOVE],
             'haul_t1', 0,
             roleHauler),
-        modRole.createRole([WORK, WORK, CARRY, MOVE], 'up_t1', 0,
+        modRole.createRole([WORK, WORK, CARRY, MOVE], 'up_t1',
+            0,
             roleUpgrader),
-        modRole.createRole([WORK, CARRY, MOVE, MOVE], 'build_t1', 0,
+        modRole.createRole([WORK, WORK, CARRY, MOVE], 'build_t1',
+            0,
             roleBuilder),
         modRole.createRole([WORK, WORK, WORK, WORK, WORK, MOVE],
             'mine_t2', 0, roleMiner),
+        modRole.createRole([
+            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY,
+            MOVE, MOVE, MOVE, MOVE
+        ], 'haul_t2', 0, roleHauler),
         modRole.createRole([WORK, WORK, WORK, WORK, CARRY, MOVE,
                 MOVE
             ],
@@ -57,7 +63,13 @@ module.exports.loop = function() {
         modRole.createRole([WORK,
             WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE,
             MOVE, MOVE
-        ], 'build_t3', buildingTarget, roleBuilder)
+        ], 'build_t3', buildingTarget, roleBuilder),
+        modRole.createRole([CARRY * 17, MOVE * 9], 'haul_t4', 0,
+            roleHauler),
+        modRole.createRole([WORK * 6, CARRY * 6, MOVE * 6], 'up_t4', 0,
+            roleUpgrader),
+        modRole.createRole([WORK * 6, CARRY * 6, MOVE * 6], 'build_t4',
+            0, roleBuilder),
     ];
 
     Memory.indexerRole = {};
@@ -67,13 +79,18 @@ module.exports.loop = function() {
         Memory.indexerRole[role.name] = i;
     }
 
+    Memory.roleLife = {};
+
     for (var indexRole in Memory.roles) {
         var role = Memory.roles[indexRole];
         role.creeps = _.filter(Game.creeps, (creep) => creep.memory.role ==
             role.name);
+        var lifeSum = 0;
         for (var indexCreep in role.creeps) {
             role.creeps[indexCreep].memory.number = indexCreep;
+            lifeSum += role.creeps[indexCreep].ticksToLive || 0;
         }
+        Memory.roleLife[role.name] = Math.round(lifeSum / role.creeps.length);
         if (Memory.roleCounts == null) {
             Memory.roleCounts = {};
         }
@@ -82,11 +99,19 @@ module.exports.loop = function() {
 
     if (Memory.roleCounts[currentMiningTier] < 0 || Memory.roleCounts[
             currentHaulingTier] == 0) {
-        Memory.roles[Memory.indexerRole[basicMiningTier]].targetCount = 1;
-        Memory.roles[Memory.indexerRole[basicHaulingTier]].targetCount = 1;
+        if (Memory.roles[Memory.indexerRole[basicMiningTier]].targetCount <
+            1) {
+            Memory.roles[Memory.indexerRole[basicMiningTier]].targetCount =
+                1;
+        }
+        if (Memory.roles[Memory.indexerRole[basicHaulingTier]].targetCount <
+            1) {
+            Memory.roles[Memory.indexerRole[basicHaulingTier]].targetCount =
+                1;
+        }
     }
 
-    if (Memory.sources == null) {
+    if (Memory.sources == null || Game.time % 150 == 0) {
         Memory.sources = [];
     }
 
@@ -104,7 +129,17 @@ module.exports.loop = function() {
         for (var indexSource in sources) {
             var source = sources[indexSource];
 
-            tempSources.push(source.id);
+            var containers = source.pos.findInRange(FIND_STRUCTURES, 1, {
+                filter: (structure) => {
+                    return structure.structureType ==
+                        STRUCTURE_CONTAINER;
+                }
+            });
+
+            tempSources.push({
+                source: source.id,
+                container: containers[0]
+            });
         }
 
         var indexRoleTarget = -1;

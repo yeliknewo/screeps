@@ -2,6 +2,9 @@ var roleUpgrader = {
     /** @param {Creep} creep **/
     run: function(creep) {
         var pathColor = '#0000FF';
+        if (creep.memory.upgrading == null) {
+            creep.memory.upgrading = false;
+        }
         if (creep.memory.upgrading && creep.carry.energy == 0 && Memory
             .creepsReady == true) {
             creep.memory.upgrading = false;
@@ -56,21 +59,31 @@ var roleUpgrader = {
                                 .carry.energy) || ((
                                     structure.structureType ==
                                     STRUCTURE_LINK) &&
-                                structure.energy >= creep.carryCapacity -
-                                creep.carry.energy);
-                            // ||
-                            // structure.structureType ==
-                            // STRUCTURE_SPAWN ||
-                            // structure.structureType ==
-                            // STRUCTURE_EXTENSION
+                                structure.energy >= 0); //creep.carryCapacity - creep.carry.energy
+
                         }
                     });
                 if (newTarget != null) {
                     creep.memory.target = newTarget.id;
                     target = newTarget;
-                } else {
-                    creep.memory.target = null;
-                    target = null;
+                }
+                if (target == null && creep.room.storage == null) {
+                    var newTarget = creep.pos.findClosestByPath(
+                        FIND_STRUCTURES, {
+                            filter: (structure) => {
+                                return (
+                                        structure.structureType ==
+                                        STRUCTURE_SPAWN ||
+                                        structure.structureType ==
+                                        STRUCTURE_EXTENSION) &&
+                                    structure.energy >= 0; //creep.carryCapacity - creep.carry.energy
+
+                            }
+                        });
+                    if (newTarget != null) {
+                        creep.memory.target = newTarget.id;
+                        target = newTarget;
+                    }
                 }
             }
             if (target != null) {
