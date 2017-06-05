@@ -43,8 +43,8 @@ var config1 = function(room) {
         // console.log('c14');
         let spaces = _.filter(tiles, (tile) => {
             return tile.terrain !==
-                "wall" && tile.x != source.pos.x && tile.y !=
-                source.pos.y;
+                "wall" && (tile.x != source.pos.x || tile.y !=
+                    source.pos.y);
         });
         // console.log('c15');
         harvester_max += spaces.length;

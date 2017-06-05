@@ -34,7 +34,7 @@ var finderStructure = function(room, pool) {
     let useSpawn = _.filter(structures, function(struct) {
         return struct.structureType == STRUCTURE_CONTAINER ||
             struct.structureType == STRUCTURE_STORAGE;
-    }).length == 0;
+    }).length < 2;
 
     pool['energySupply'] = toIDs(_.filter(structures, function(struct) {
         return struct.structureType == STRUCTURE_CONTAINER ||

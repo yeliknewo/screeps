@@ -5,6 +5,10 @@ var job_to_actions = {
     'collect': ['pickup', 'transfer'],
 }
 
+var wait = function(creep, target, target_requester) {
+    let result = creep.moveTo(target);
+}
+
 //REVIEW
 //for harvesters without carry parts
 var mine = function(creep, target, target_requester) {
@@ -16,7 +20,7 @@ var mine = function(creep, target, target_requester) {
         }
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Mine.`
         );
         creep.needTarget(target_requester, FIND_SOURCES);
     }
@@ -24,18 +28,18 @@ var mine = function(creep, target, target_requester) {
 
 var harvest = function(creep, target, target_requester) {
     let result = creep.harvest(target);
-    if (result == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target);
-    } else if (creep.carry.energy == creep.carryCapacity) {
+    if (creep.carry.energy == creep.carryCapacity) {
         let new_action = creep.nextAction();
 
         creep.needTarget(target_requester, 'energyStorage');
+    } else if (result == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
     } else if (creep.carry.energy == 0 && creep.memory.stationary >
         3) {
         creep.needTarget(target_requester, FIND_SOURCES);
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Harvest.`
         );
         creep.needTarget(target_requester, FIND_SOURCES);
     }
@@ -50,12 +54,10 @@ var transfer = function(creep, target, target_requester) {
         creep.moveTo(target);
     } else if (creep.carry.energy == creep.carryCapacity && creep.memory.stationary >
         2) {
-        creep.memory.job = 'construct';
-        creep.nextAction();
-        creep.needTarget(target_requester, FIND_CONSTRUCTION_SITES);
+        creep.needTarget(target_requester, 'energyStorage');
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Transfer.`
         );
         creep.needTarget(target_requester, 'energyStorage');
     }
@@ -76,12 +78,10 @@ var withdraw = function(creep, target, target_requester) {
     } else if (creep.carry.energy < creep.carryCapacity && creep.memory.stationary >
         5) {
         //REVIEW
-        creep.memory.job = 'gather';
-        creep.nextAction();
-        creep.needTarget(target_requester, FIND_SOURCES);
+        creep.needTarget(target_requester, 'energySupply');
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Withdraw.`
         );
         creep.needTarget(target_requester, 'energySupply');
     }
@@ -89,14 +89,14 @@ var withdraw = function(creep, target, target_requester) {
 
 var upgradeController = function(creep, target, target_requester) {
     let result = creep.upgradeController(target);
-    if (result == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target);
-    } else if (result == ERR_NOT_ENOUGH_RESOURCES) {
+    if (result == ERR_NOT_ENOUGH_RESOURCES) {
         creep.nextAction();
         creep.needTarget(target_requester, 'energySupply');
+    } else if (result == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action UpgradeController.`
         );
         creep.needTarget(target_requester, STRUCTURE_CONTROLLER);
     }
@@ -104,14 +104,14 @@ var upgradeController = function(creep, target, target_requester) {
 
 var build = function(creep, target, target_requester) {
     let result = creep.build(target);
-    if (result == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target);
-    } else if (result == ERR_NOT_ENOUGH_RESOURCES) {
+    if (creep.carry.energy == 0) {
         creep.nextAction();
         creep.needTarget(target_requester, 'energySupply');
+    } else if (result == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Build.`
         );
         creep.needTarget(target_requester, FIND_CONSTRUCTION_SITES);
     }
@@ -119,14 +119,14 @@ var build = function(creep, target, target_requester) {
 
 var pickup = function(creep, target, target_requester) {
     let result = creep.pickup(target);
-    if (result == ERR_NOT_IN_RANGE) {
-        creep.moveTo(target);
-    } else if (creep.carry.energy == creep.carryCapacity) {
+    if (creep.carry.energy == creep.carryCapacity) {
         creep.nextAction();
         creep.needTarget(target_requester);
+    } else if (result == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
     } else if (result == ERR_INVALID_TARGET) {
         console.log(
-            `Creep ${creep.name} had invalid target ${creep.memory.target}.`
+            `Creep ${creep.name} had invalid target ${creep.memory.target} for action Pickup.`
         );
         creep.needTarget(target_requester);
     }
