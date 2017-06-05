@@ -61,26 +61,6 @@ var config1 = function(room) {
 
         buildRoad(config, room, spawn.pos, source.pos);
         // console.log('c18');
-        if(room.controller) {
-            let path = room.findPath(spawn, room.controller);
-            _.forEach(path, function(tile) {
-                // console.log('c5');
-                config.queue.push({
-                    x: tile.x,
-                    y: tile.y,
-                    structureType: STRUCTURE_ROAD
-                });
-                // console.log('c6');
-            });
-            let serial = Room.serializePath(path);
-            room.memory.buildPath = serial;  //save the buildpath for later config generators
-
-        } else {
-            console.log(`Room ${room.name} does not have a controller, generating alternate build path.`);
-            //TODO:
-        }
-
-        buildRoad(config, room, spawn.pos, room.controller.pos); //buildings will be built along this road (so make sure its not too short)
     });
 
     buildRoad(config, room, spawn.pos, room.controller.pos);
@@ -123,6 +103,40 @@ var config1 = function(room) {
 
 var config2 = function(room) {
     let config = {};
+
+    config.queue = [];
+
+    //calculates harvester max and places extensions around sources
+    let harvester_max = 0;
+    _.forEach(sources, function(source) {
+        // console.log('c11');
+        let x = source.pos.x;
+        // console.log('c12');
+        let y = source.pos.y;
+        // console.log('c13');
+        let tiles = room.lookAtArea(y - 1, x - 1,
+            y + 1, x + 1, true);
+        // console.log('c14');
+        let spaces = _.filter(tiles, (tile) => {
+            return tile.type === "terrain" && tile.terrain !==
+                "wall" && tile.x != source.pos.x && tile.y !=
+                source.pos.y;
+        });
+        // console.log('c15');
+        harvester_max += spaces.length;
+        // console.log('c16');
+
+        //add 5 extensions to the build queue
+        let max_extensions = CONTROLLER_STRUCTURES.extension[room.controller.level]; //const with structure maxes by rcl
+        _.forEach(spaces, (tile) => {
+            config.queue.push({x: tile.x, y: tile.y, structureType: STRUCTURE_EXTENSION});
+            max_extensions -= 1;
+            if(max_extensions == 0) {
+                return false;
+            }
+        });
+    }
+
     config.creeps = {};
 
     config1(room);
