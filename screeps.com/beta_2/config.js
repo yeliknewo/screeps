@@ -61,6 +61,26 @@ var config1 = function(room) {
 
         buildRoad(config, room, spawn.pos, source.pos);
         // console.log('c18');
+        if(room.controller) {
+            let path = room.findPath(spawn, room.controller);
+            _.forEach(path, function(tile) {
+                // console.log('c5');
+                config.queue.push({
+                    x: tile.x,
+                    y: tile.y,
+                    structureType: STRUCTURE_ROAD
+                });
+                // console.log('c6');
+            });
+            let serial = Room.serializePath(path);
+            room.memory.buildPath = serial;  //save the buildpath for later config generators
+
+        } else {
+            console.log(`Room ${room.name} does not have a controller, generating alternate build path.`);
+            //TODO:
+        }
+
+        buildRoad(config, room, spawn.pos, room.controller.pos); //buildings will be built along this road (so make sure its not too short)
     });
 
     buildRoad(config, room, spawn.pos, room.controller.pos);
